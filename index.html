@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Place Order | Luxury Dining</title>
+
+<style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f7f3ec url('https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=1500&q=80')
+            center/cover no-repeat;
+        font-family: "Inter", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 245, 230, 0.45);
+        backdrop-filter: blur(6px);
+    }
+
+    .card {
+        position: relative;
+        z-index: 10;
+        width: 430px;
+        padding: 42px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 12px 38px rgba(0,0,0,0.16);
+        border: 1px solid rgba(200, 175, 120, 0.35);
+    }
+
+    h2 {
+        font-size: 30px;
+        font-family: "Playfair Display", serif;
+        text-align: center;
+        color: #7a5a2b;
+        margin-bottom: 28px;
+    }
+
+    label {
+        margin-top: 16px;
+        display: block;
+        font-family: "Playfair Display", serif;
+        color: #5d5142;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #c6b59b;
+        background: #fbf9f5;
+        margin-top: 6px;
+        font-size: 15px;
+        color: #4a4035;
+    }
+
+    textarea {
+        height: 80px;
+        resize: none;
+    }
+
+    button {
+        width: 100%;
+        padding: 15px;
+        margin-top: 25px;
+        background: linear-gradient(135deg, #d8b574, #c9a35a);
+        border-radius: 12px;
+        border: none;
+        color: white;
+        font-size: 17px;
+        font-family: "Playfair Display", serif;
+        cursor: pointer;
+    }
+
+    .msg {
+        margin-top: 18px;
+        text-align: center;
+        font-family: "Playfair Display", serif;
+    }
+</style>
+
+<!-- Fonts -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap">
+
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="card">
+    <h2>Luxury Dining Order</h2>
+
+    <label>Customer Name</label>
+    <input id="name" placeholder="John Smith" />
+
+    <label>Menu Item</label>
+    <input id="item" placeholder="Truffle Risotto, Lamb Rack..." />
+
+    <label>Quantity</label>
+    <select id="qty">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4+</option>
+    </select>
+
+    <label>Special Requests (Optional)</label>
+    <textarea id="notes" placeholder="Allergies, spice level, doneness..."></textarea>
+
+    <button onclick="createOrder()">Submit Order</button>
+    <div id="msg" class="msg"></div>
+</div>
+
+<!-- Firebase COMPAT (Required for your code to work) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCT9xJpf2Pqc5ztXUQgDKr6QomDGrrCsQQ",
+  authDomain: "live-order-board-7d91d.firebaseapp.com",
+  projectId: "live-order-board-7d91d",
+  storageBucket: "live-order-board-7d91d.firebasestorage.app",
+  messagingSenderId: "554540932186",
+  appId: "1:554540932186:web:17bf2a4367c294764a0c63"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+async function createOrder() {
+    const name = document.getElementById("name").value;
+    const item = document.getElementById("item").value;
+    const qty = document.getElementById("qty").value;
+    const notes = document.getElementById("notes").value;
+    const msg = document.getElementById("msg");
+
+    if (!name || !item) {
+        msg.textContent = "Please fill required fields.";
+        msg.style.color = "#a53b3b";
+        return;
+    }
+
+    await db.collection("orders").add({
+        name,
+        item,
+        qty,
+        notes,
+        status: "New",
+        createdAt: new Date()
+    });
+
+    msg.textContent = "Order submitted successfully.";
+    msg.style.color = "#2e6b47";
+
+    document.getElementById("name").value = "";
+    document.getElementById("item").value = "";
+    document.getElementById("notes").value = "";
+}
+</script>
+
+</body>
+</html>
